@@ -153,6 +153,10 @@ Alt agent'ın "bitti" demesi kanıt değildir.
   farklı bir Claude modeline ver; denetçiye yazıcının özetini değil işin kendisini göster.
 - Eksik ya da hatalı iş: aynı agent'a neyin yanlış olduğunu somut yazarak geri gönder. İkinci
   kez tutmazsa bir üst modele çıkar (Haiku → Sonnet → Opus) ya da Astra'ya sor.
+- Alt agent engele takılırsa (izin reddi, eksik araç, bulunamayan dosya) işi devralma. Brief'i
+  düzelt (ör. izinli bir araçla aynı sonucu veren yolu yaz) ve aynı agent'a geri gönder ya da işi
+  başka bir alt agent'a ver. İş küçük ya da içerik belli diye kendin yazma. Engel alt agent'larla
+  aşılamıyorsa kullanıcıya bildir ve nasıl ilerleneceğini sor.
 - Doğrulanmamış sonucu doğrulanmış gibi raporlama.
 
 ## 6. Sınırlar
