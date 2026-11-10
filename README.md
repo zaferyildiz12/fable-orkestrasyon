@@ -1,8 +1,8 @@
 # fable-orkestrasyon
 
-Claude Code için bir skill. Ana oturumun modeli Fable 5.2 ise Fable işi kendisi yapmaz: planlar, işi böler ve alt agent'lara dağıtır, sonra sonucu denetleyip raporlar. Her modele kendi tarzında prompt yazar: Opus'a gevşek, Sonnet'e sıkı, GPT 6.1 Sol'a detaylı, GPT 6 Astra'dan ikinci görüş ister, Haiku ve GPT Luna'ya büyük veri işi verir.
+Claude Code için bir skill. Ana oturumun modeli Fable 5.2 ise Fable bir orkestra şefi gibi çalışır: planlar, işi böler, alt agent'lara dağıtır, sonucu denetleyip raporlar.
 
-Bu eşleştirmeler zorunlu atama değil, varsayılan eğilimlerdir. Hangi modelleri, kaç agent'ı ve hangi sırayla kullanacağına Fable işe bakarak kendisi karar verir; bir işte tek model yetebilir, GPT hiç kullanılmayabilir.
+Tek katı kural, Fable'ın işin kendisini yapmamasıdır. Hangi modeli, kaç agent'ı, hangi sırayı, brief'in biçimini ve denetimin yolunu şef seçer; bir işte tek model yetebilir, GPT hiç kullanılmayabilir. Aşağıdaki eşleştirmeler (Opus'a gevşek, Sonnet'e sıkı, GPT 6.1 Sol'a detaylı prompt, GPT 6 Astra'dan ikinci görüş, Haiku ve GPT Luna'ya büyük veri) atama değil, varsayılan eğilimlerdir.
 
 ```
                          FABLE 5.2
