@@ -1,6 +1,8 @@
 # Prompt şablonları
 
-Köşeli parantezli yerleri doldur. Şablon bir başlangıçtır; işe uymayan satırı çıkar.
+Bu şablonlar başlangıç noktasıdır, zorunlu biçim değildir. İşe uymayan satırı çıkar, eksik
+olanı ekle, gerekirse iki şablonu karıştır ya da hiç kullanma. Ölçü, alt agent'ın brief'ten
+başka bir şey bilmeden işi doğru yapabilmesidir.
 
 ## Opus (gevşek)
 
@@ -79,7 +81,7 @@ Bir problem üzerinde çalışıyoruz ve bağımsız bir görüş istiyoruz.
 
 Problem: [ne çözülmeye çalışılıyor]
 Kısıtlar: [değişmeyecek şeyler]
-Malzeme: [dosya yolları / plan metni / hata çıktısı — ham haliyle]
+Malzeme: [dosya yolları / plan metni / hata çıktısı, ham haliyle]
 
 Sorular:
 1. Bunu sıfırdan sen çözseydin nasıl yaklaşırdın?
@@ -97,7 +99,7 @@ Astra'ya kendi çözümünü ya da beklediğin cevabı yazma. Plan eleştirisi i
 ```
 İşlem: [tek mekanik işlem, ör. "her satırdaki telefon numarasını +90XXXXXXXXXX biçimine çevir"]
 
-Girdi: [dosya yolu], biçim: [CSV, sütunlar: a, b, c] — yalnız [N–M] satırları.
+Girdi: [dosya yolu], biçim: [CSV, sütunlar: a, b, c], yalnız [N–M] satırları.
 Çıktı: [dosya yolu], biçim: [şema]. Girdideki sıra korunur, satır atlanmaz.
 
 Örnekler:

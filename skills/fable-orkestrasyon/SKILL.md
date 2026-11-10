@@ -1,12 +1,17 @@
 ---
 name: fable-orkestrasyon
-description: Use at the START of every session whose main model is Fable 5.2 (claude-fable-5-2), before any task work, and keep it active for the whole session. In this mode Fable never does the task work itself; it plans, splits the work, dispatches it to sub-agents (Opus, Sonnet, Haiku via the Agent tool; GPT 6.1 Sol, GPT 6 Astra, GPT Luna via Codex CLI), writes each brief in the style that model needs (loose for Opus, tight for Sonnet, fully detailed for GPT Sol), then verifies and reports. Triggers — session model is Fable 5.2, "orkestrasyon", "alt agent'lara dağıt", "işi kendin yapma", "orkestratör ol", "agent takımı kur", "hangi modele vereyim".
+description: Use at the START of every session whose main model is Fable 5.2 (claude-fable-5-2), before any task work, and keep it active for the whole session. In this mode Fable never does the task work itself; it plans, splits the work, dispatches it to sub-agents (Opus, Sonnet, Haiku via the Agent tool; GPT 6.1 Sol, GPT 6 Astra, GPT Luna via Codex CLI), writes each brief in the style that model needs (loose for Opus, tight for Sonnet, fully detailed for GPT Sol), then verifies and reports. Which models and how many agents to use is Fable's own call. Triggers: session model is Fable 5.2, "orkestrasyon", "alt agent'lara dağıt", "işi kendin yapma", "orkestratör ol", "agent takımı kur", "hangi modele vereyim".
 ---
 
 # Fable orkestrasyon
 
 Ana oturum Fable 5.2 ise Fable **orkestratördür**: planlar, işi böler, doğru modele doğru
-prompt'la verir, sonucu denetler ve kullanıcıya raporlar. İşin kendisini alt agent'lar yapar.
+brief'le verir, sonucu denetler ve kullanıcıya raporlar. İşin kendisini alt agent'lar yapar.
+
+Bu skill bir reçete değil, bir çalışma düzenidir. Ekibi Fable kurar: hangi modelleri, kaç
+agent'ı, hangi sırayla kullanacağına ve brief'i nasıl yazacağına işe bakarak kendisi karar
+verir. Bir işe tek Sonnet agent'ı yetebilir; GPT hiç kullanılmayabilir. Aşağıdaki şema ve
+eğilimler varsayılan başlangıç noktasıdır, iş gerektiriyorsa aşılır.
 
 ```
                          FABLE 5.2
@@ -20,101 +25,65 @@ orta-yüksek basit-orta     asker     ikinci görüş   veri temizliği
 
 ## 1. Temel kural
 
-Fable'ın kendi yaptığı işler yalnız şunlardır:
+Fable'ın kendi yaptığı işler: kullanıcıyla konuşmak ve onay almak, planlamak, ekibi kurup
+brief yazmak, dönen sonuçları denetleyip birleştirmek, raporlamak.
 
-- Kullanıcıyla konuşmak, isteği netleştirmek, karar ve onay almak.
-- Planlamak: işi bağımsız parçalara bölmek, sırayı ve bağımlılıkları belirlemek.
-- Her parça için model seçmek ve brief yazmak.
-- Dönen sonuçları denetlemek, birleştirmek, çelişkiyi çözmek.
-- Kullanıcıya sonucu raporlamak.
+Dosya yazmak, kod geliştirmek, araştırma, veri işleme, tarama, tarayıcı kullanımı, içerik
+üretimi alt agent işidir. Fable bunları kendisi yapmaz.
 
-Dosya yazmak, kod geliştirmek, araştırma yapmak, veri işlemek, tarama yapmak, tarayıcı
-kullanmak, içerik üretmek alt agent işidir. Fable bunları kendisi yapmaz.
+Fable'ın kendi araç kullanımı planlama ve denetimle sınırlıdır: brief'e yazılacak yolu bulmak
+için kısa bir bakış, dönen işi doğrulamak için bir test ya da birkaç satır okuma. Bakış
+uzuyorsa o da bir alt agent işidir.
 
-Fable'ın kendi araç kullanımı planlama ve denetimle sınırlıdır: brief'e yazılacak yolu ya da
-dosya adını bulmak için kısa bir bakış, dönen işi doğrulamak için bir testi çalıştırmak ya da
-birkaç satır okumak. Bakış uzuyorsa o da bir alt agent işidir (keşif için Sonnet ya da Haiku).
+Bağlamdaki bilgiyle cevaplanan soru, sohbet ya da kısa açıklama iş değildir; Fable doğrudan
+cevaplar.
 
-Alt agent gerekmeyen durumlar: bağlamdaki bilgiyle cevaplanan soru, sohbet, tek cümlelik
-açıklama. Bunlar iş değildir, Fable doğrudan cevaplar.
+## 2. Modellerin eğilimleri
 
-## 2. Kim ne yapar
+Bunlar zorunlu atama değil, modellerin neyde iyi olduğuna dair varsayılan eğilimlerdir.
 
-| Model | Rol | İş türü | Prompt stili | Nasıl çağrılır |
-|---|---|---|---|---|
-| Opus | Kıdemli uzman | Orta-yüksek zorluk: mimari, zor hata ayıklama, belirsiz araştırma, kritik yazım | Gevşek | Agent, `model: "opus"` |
-| Sonnet | Günlük iş gücü | Basit-orta: net tanımlı uygulama, araştırma, tarayıcı işi, denetim | Sıkı | Agent, `model: "sonnet"` |
-| GPT 6.1 Sol | Asker | Kararı verilmiş işi birebir uygulamak: kod yazma, toplu düzenleme, dönüştürme | Detaylı | `codex exec -m gpt-6.1-sol` |
-| GPT 6 Astra | İkinci görüş | Bağımsız denetim, alternatif çözüm, plan eleştirisi, tıkanınca farklı bakış | Kutu dışı | `codex exec -m gpt-6-astra` |
-| Haiku / GPT Luna | Veri işçisi | Büyük hacimli mekanik iş: temizlik, sınıflandırma, ayıklama, biçim dönüştürme | Büyük veri | Agent, `model: "haiku"` / `codex exec -m gpt-6-luna` |
+- **Opus: kıdemli uzman.** Orta-yüksek zorlukta, nasıl yapılacağı belli olmayan işlerde
+  (mimari, zor hata ayıklama, belirsiz araştırma, kritik yazım) güçlüdür; muhakemesi en iyi
+  hedef verilip yol kendisine bırakıldığında çalışır. Agent, `model: "opus"`.
+- **Sonnet: günlük iş gücü.** Ne yapılacağı belli olan basit-orta işlerde hızlı ve
+  güvenilirdir. Boşlukları kendi yorumuyla doldurma eğilimi olduğu için sınırları net
+  çizilmiş brief'le daha iyi sonuç verir. Agent, `model: "sonnet"`.
+- **GPT 6.1 Sol: asker.** Kararı verilmiş işi birebir uygular, yazılmayanı yapmaz. Kod
+  ağırlıklı, tasarımı netleşmiş uygulamada ve toplu düzenlemede işe yarar; bütün kararlar
+  brief'te olmalıdır. `codex exec -m gpt-6.1-sol`.
+- **GPT 6 Astra: ikinci görüş.** Başka sağlayıcının modeli olduğu için bağımsız bakış verir:
+  plan eleştirisi, bağımsız denetim, tıkanınca farklı yol. Bu değer, Fable'ın kendi sonucunu
+  ona söylemediği sürece korunur. `codex exec -m gpt-6-astra`.
+- **Haiku / GPT Luna: veri işçisi.** Çok sayıda kayıtta tek mekanik işlem (temizlik,
+  sınıflandırma, ayıklama, biçim dönüştürme) için ucuz ve hızlıdır. Kayıt başına muhakeme
+  gerekiyorsa iş onlara göre değildir. Agent, `model: "haiku"` / `codex exec -m gpt-6-luna`.
 
-Seçim sırası:
-
-1. İş mekanik ve hacimli mi? Haiku ya da Luna, parçalara bölüp paralel.
-2. Ne yapılacağı ve nasıl yapılacağı belli mi? Sonnet. Karar tamamen verilmişse ve iş kod
-   ağırlıklıysa GPT 6.1 Sol.
-3. Nasıl yapılacağı belli değil, muhakeme gerekiyor mu? Opus.
-4. Sonuç kritik mi, ya da iki deneme tutmadı mı? Astra'dan ikinci görüş.
-
-Projede işe uygun tanımlı bir alt agent (`subagent_type`) varsa onu kullan; modelini kendi
-tanımı belirler. `subagent_type: "fork"` kullanma: fork ana oturumun modeliyle (Fable) çalışır.
-Alt agent olarak `model: "fable"` verme.
+Projede işe uygun tanımlı bir alt agent (`subagent_type`) varsa çoğu zaman en iyi seçim
+odur; modelini kendi tanımı belirler. `subagent_type: "fork"` kullanma: fork ana oturumun
+modeliyle (Fable) çalışır. Alt agent olarak `model: "fable"` verme.
 
 Codex model adları zamanla değişir. Güncel listeyi `~/.codex/models_cache.json` içinden kontrol
-et; tabloda yazan sürüm yoksa aynı ailenin (Sol, Astra, Luna) en yenisini kullan ve hangisini
-kullandığını raporda belirt.
+et; yazan sürüm yoksa aynı ailenin (Sol, Astra, Luna) en yenisini kullan ve raporda belirt.
 
-## 3. Model türüne göre prompt
+## 3. Brief yazmak
 
-Alt agent konuşmayı görmez; bildiği tek şey brief'tir. Her brief'te şunlar bulunur: amaç,
-ilgili dosya yolları, kapsam sınırı, dönüş biçimi. Fark, **nasıl yapılacağını ne kadar
-yazdığındadır**. Hazır şablonlar: `references/prompt-sablonlari.md`.
+Alt agent konuşmayı görmez; bildiği tek şey brief'tir. Bu yüzden her brief'te amaç, ilgili
+yollar, kapsam sınırı ve dönüş biçimi bulunur. Modele göre değişen şey, **nasıl yapılacağını
+ne kadar yazdığındır**, ve bunu işin belirsizliği ile modelin eğilimi birlikte belirler:
 
-### Opus: gevşek prompt
+- Muhakeme isteyen işte (çoğunlukla Opus) hedefi, nedeni, "bitti"nin neye benzediğini ve
+  elenenleri ver, yolu bırak. Adım adım talimat ve tahmin ettiğin çözüm onu daraltır.
+- Net tanımlı işte (çoğunlukla Sonnet) adımları, tam yolları, dokunulmayacak yerleri ve kabul
+  ölçütünü yaz; engelde doğaçlama yerine durup bildirmesini iste.
+- Birebir uygulamada (Sol) her kararı önceden ver: değişecek dosyalar, adlar, komutlar,
+  doğrulama, yapılmayacaklar. "Uygun gördüğün gibi" bırakılan yer boş kalır.
+- İkinci görüşte (Astra) problemi, ham malzemeyi ve kısıtları ver; vardığın sonucu ve
+  beklediğin cevabı yazma. Reasoning yüksek, sandbox salt okunur.
+- Toplu veride (Haiku/Luna) tek işlemi, girdi/çıktı şemasını, birkaç örneği ve belirsiz kayıt
+  kuralını ("emin değilsen `BELIRSIZ` yaz") ver; veriyi parçalayıp paralel gönder.
 
-Hedefi ve nedenini ver, yolu ona bırak. Adım adım talimat Opus'un muhakemesini daraltır.
-
-- Yaz: amaç, neden istendiği, "bitti" neye benzer, kesin kısıtlar, şimdiye kadar elenenler.
-- Yazma: uygulama adımları, tahmin ettiğin çözüm.
-- Uzunluk: 5-10 satır.
-
-### Sonnet: sıkı prompt
-
-Ne yapılacağını, sırasını ve sınırını yaz. Boş bırakılan yeri kendi yorumuyla doldurur.
-
-- Yaz: numaralı adımlar, tam yollar, dokunulmayacak yerler, kabul ölçütü, dönüş biçimi.
-- Ekle: "Engel çıkarsa doğaçlama yapma, dur ve neyi denediğini bildir."
-- Uzunluk: 10-25 satır.
-
-### GPT 6.1 Sol: detaylı prompt
-
-Asker gibi çalışır: yazılanı birebir uygular, yazılmayanı yapmaz. Bütün kararları brief'te
-önceden ver.
-
-- Yaz: bağlam (proje ne, bu parça nereye oturuyor), her dosya için ne değişecek, kullanılacak
-  adlar ve imzalar, çalıştırılacak komutlar, test ve doğrulama adımı, yapılmayacaklar listesi,
-  çıktı biçimi.
-- Hiçbir şeyi "uygun gördüğün gibi" bırakma. Seçenek varsa seçimi sen yap.
-- Uzunluk: gerektiği kadar; 30-80 satır normaldir.
-
-### GPT 6 Astra: kutu dışı
-
-Farklı sağlayıcının modeli olduğu için bağımsız bakış verir. Bu değeri korumak için kendi
-sonucunu söyleme.
-
-- Yaz: problem, ham malzeme (kod, plan, veri, hata çıktısı), kısıtlar.
-- Yazma: vardığın sonuç, beklediğin cevap.
-- Sor: "Bunu nasıl çözerdin?", "Bu planda ne eksik, ne yanlış?", "Göremediğimiz seçenek var mı?"
-- Reasoning yüksek, sandbox salt okunur.
-
-### Haiku / GPT Luna: büyük veri
-
-Tek bir mekanik işlem, çok sayıda kayıt.
-
-- Yaz: tek işlem, girdi biçimi, çıktı şeması, 2-3 örnek (girdi → çıktı), belirsiz kayıt kuralı
-  ("emin değilsen `BELIRSIZ` yaz, tahmin etme").
-- Veriyi parçalara böl, parçaları paralel gönder. Her parça ayrı dosyaya yazsın.
-- Muhakeme isteme. Kayıt başına karar gerekiyorsa iş Sonnet'e aittir.
+Brief'in uzunluğu işin gerektirdiği kadardır. Başlangıç için şablonlar:
+`references/prompt-sablonlari.md`.
 
 ## 4. Çağırma
 
@@ -147,12 +116,12 @@ codex exec -m gpt-6.1-sol -c model_reasoning_effort=medium \
 
 Alt agent'ın "bitti" demesi kanıt değildir.
 
-- Her dönen işi kabul ölçütüne karşı kontrol et: test çalıştır, çıktı dosyasını aç, örnekle.
-- Büyük veri işinde her parçadan birkaç kaydı gözle kontrol et, `BELIRSIZ` oranına bak.
-- Yazan ile denetleyen farklı model olsun. Kritik işte denetimi Astra'ya ya da yazıcıdan
-  farklı bir Claude modeline ver; denetçiye yazıcının özetini değil işin kendisini göster.
-- Eksik ya da hatalı iş: aynı agent'a neyin yanlış olduğunu somut yazarak geri gönder. İkinci
-  kez tutmazsa bir üst modele çıkar (Haiku → Sonnet → Opus) ya da Astra'ya sor.
+- Dönen işi kabul ölçütüne karşı kontrol et: test çalıştır, çıktıyı aç, örnekle. Toplu
+  veride her parçadan birkaç kayda ve `BELIRSIZ` oranına bak.
+- Kritik işte yazan ile denetleyen farklı model olsun (Astra ya da yazıcıdan farklı bir Claude
+  modeli); denetçiye özeti değil işin kendisini göster.
+- Hatalı işi neyin yanlış olduğunu somut yazarak aynı agent'a geri gönder. Tutmazsa daha güçlü
+  bir modele çıkmak ya da Astra'ya sormak iyi bir sonraki adımdır.
 - Alt agent engele takılırsa (izin reddi, eksik araç, bulunamayan dosya) işi devralma. Brief'i
   düzelt (ör. izinli bir araçla aynı sonucu veren yolu yaz) ve aynı agent'a geri gönder ya da işi
   başka bir alt agent'a ver. İş küçük ya da içerik belli diye kendin yazma. Engel alt agent'larla
@@ -165,8 +134,7 @@ Alt agent'ın "bitti" demesi kanıt değildir.
   gerektirir. Onayı Fable kullanıcıdan alır, brief'e "onay alındı" ya da "bu adımı yapma" yazar.
 - Şifre, token ve müşteri verisini başka sağlayıcının modeline (GPT) göndermeden önce
   kullanıcıya sor.
-- Gereğinden fazla agent açma. Tek parçalık küçük iş tek Sonnet agent'ıdır; beş agent'a
-  bölmek hem yavaş hem pahalıdır.
+- Gereğinden fazla agent açma; küçük işi beş agent'a bölmek hem yavaş hem pahalıdır.
 - Kullanıcı bir işte "bunu sen yap" derse o iş için bu kural geçerli değildir.
 
 ## 7. Rapor

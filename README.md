@@ -2,6 +2,8 @@
 
 Claude Code için bir skill. Ana oturumun modeli Fable 5.2 ise Fable işi kendisi yapmaz: planlar, işi böler ve alt agent'lara dağıtır, sonra sonucu denetleyip raporlar. Her modele kendi tarzında prompt yazar: Opus'a gevşek, Sonnet'e sıkı, GPT 6.1 Sol'a detaylı, GPT 6 Astra'dan ikinci görüş ister, Haiku ve GPT Luna'ya büyük veri işi verir.
 
+Bu eşleştirmeler zorunlu atama değil, varsayılan eğilimlerdir. Hangi modelleri, kaç agent'ı ve hangi sırayla kullanacağına Fable işe bakarak kendisi karar verir; bir işte tek model yetebilir, GPT hiç kullanılmayabilir.
+
 ```
                          FABLE 5.2
                       plan + yönetim
@@ -12,7 +14,7 @@ orta-yüksek basit-orta     asker     ikinci görüş   veri temizliği
   gevşek      sıkı        detaylı     kutu dışı      büyük veri
 ```
 
-## Kim ne yapar
+## Varsayılan eğilimler
 
 | Model | Rol | Prompt stili |
 |---|---|---|
@@ -39,8 +41,8 @@ Yalnız tek projede kullanmak için klasör projenin `.claude/skills/` altına k
 
 ## Dosyalar
 
-- `skills/fable-orkestrasyon/SKILL.md`: kurallar.
-- `skills/fable-orkestrasyon/references/prompt-sablonlari.md`: model başına brief şablonları.
+- `skills/fable-orkestrasyon/SKILL.md`: çalışma düzeni, model eğilimleri ve sınırlar.
+- `skills/fable-orkestrasyon/references/prompt-sablonlari.md`: model başına brief şablonları (başlangıç noktası, zorunlu biçim değil).
 
 ## Not
 
